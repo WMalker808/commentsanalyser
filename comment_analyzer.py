@@ -10,6 +10,7 @@ import os
 import re
 from datetime import datetime
 from anthropic import Anthropic
+from prompts import SENTIMENT, FOLLOWUP_IDEAS, DISCUSSION_QUESTIONS, COMMERCIAL_OPPORTUNITIES, THEMES, SUMMARY
 
 # Initialize Anthropic client
 def get_client():
@@ -74,30 +75,7 @@ def analyze_sentiment(comments_text: str, article_title: str) -> dict:
     """Analyze overall sentiment and sentiment by topic."""
     ensure_client()
 
-    prompt = f"""Analyze the sentiment of these reader comments on the article "{article_title}".
-
-COMMENTS:
-{comments_text}
-
-Provide your analysis in the following JSON format (no other text):
-{{
-  "overall": {{
-    "positive": <percentage 0-100>,
-    "neutral": <percentage 0-100>,
-    "negative": <percentage 0-100>,
-    "summary": "<one sentence describing overall mood>"
-  }},
-  "byTopic": [
-    {{
-      "topic": "<specific topic discussed>",
-      "sentiment": "positive|negative|mixed|neutral",
-      "percentage": <% of comments touching this topic>,
-      "explanation": "<brief explanation>"
-    }}
-  ]
-}}
-
-Include 3-5 topics in byTopic. Percentages in "overall" must sum to 100."""
+    prompt = SENTIMENT.format(article_title=article_title, comments_text=comments_text)
 
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
@@ -121,26 +99,7 @@ def extract_themes(comments_text: str, article_title: str) -> list:
     """Extract main themes from comments."""
     ensure_client()
 
-    prompt = f"""Identify the main themes/topics that readers are discussing in these comments on "{article_title}".
-
-COMMENTS:
-{comments_text}
-
-Provide your analysis in the following JSON format (no other text):
-{{
-  "themes": [
-    {{
-      "name": "<theme name>",
-      "description": "<brief description of this theme>",
-      "frequency": "<high|medium|low>",
-      "sentiment": "positive|negative|mixed|neutral",
-      "representativeQuotes": ["<exact quote from comment>", "<another quote>"],
-      "keywords": ["keyword1", "keyword2"]
-    }}
-  ]
-}}
-
-Identify 5-7 themes, ordered by prominence. Use actual quotes from the comments."""
+    prompt = THEMES.format(article_title=article_title, comments_text=comments_text)
 
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
@@ -163,25 +122,7 @@ def generate_summary(comments_text: str, article_title: str, comment_count: int)
     """Generate executive summary and identify notable comments."""
     ensure_client()
 
-    prompt = f"""Summarize the reader discussion on "{article_title}" ({comment_count} total comments).
-
-COMMENTS (sample):
-{comments_text}
-
-Provide your analysis in the following JSON format (no other text):
-{{
-  "executiveSummary": "<2-3 paragraph summary of the discussion, key points of agreement/disagreement, and overall reader reception>",
-  "consensus": ["<point most readers agree on>", "<another point>"],
-  "contention": ["<point readers disagree about>", "<another contentious point>"],
-  "notableComments": [
-    {{
-      "excerpt": "<shortened quote from a particularly insightful/representative comment>",
-      "why": "<why this comment is notable>"
-    }}
-  ]
-}}
-
-Include 2-4 consensus points, 2-4 contention points, and 3-5 notable comments."""
+    prompt = SUMMARY.format(article_title=article_title, comments_text=comments_text, comment_count=comment_count)
 
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
@@ -204,32 +145,7 @@ def generate_followup_ideas(comments_text: str, article_title: str) -> list:
     """Generate follow-up story ideas from comments."""
     ensure_client()
 
-    prompt = f"""Based on these reader comments on "{article_title}", identify potential follow-up story ideas that a journalist could pursue.
-
-Look for:
-- Questions readers are asking that weren't answered
-- Personal experiences readers mention that could be explored
-- Related topics readers want covered
-- Controversies or debates that deserve deeper investigation
-- Expert perspectives readers are requesting
-
-COMMENTS:
-{comments_text}
-
-Provide your analysis in the following JSON format (no other text):
-{{
-  "followUpIdeas": [
-    {{
-      "headline": "<potential headline for follow-up piece>",
-      "angle": "<description of the story angle>",
-      "interestLevel": "high|medium|low",
-      "evidence": "<what in the comments suggests this>",
-      "suggestedSources": ["<type of source to interview>", "<data to gather>"]
-    }}
-  ]
-}}
-
-Provide 3-5 actionable follow-up ideas, ordered by potential reader interest."""
+    prompt = FOLLOWUP_IDEAS.format(article_title=article_title, comments_text=comments_text)
 
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
@@ -246,6 +162,52 @@ Provide 3-5 actionable follow-up ideas, ordered by potential reader interest."""
         if match:
             return json.loads(match.group()).get("followUpIdeas", [])
         return [{"error": "Failed to parse follow-up ideas", "raw": text}]
+
+
+def generate_discussion_questions(comments_text: str, article_title: str) -> list:
+    """Generate thought-provoking questions to promote constructive debate."""
+    ensure_client()
+
+    prompt = DISCUSSION_QUESTIONS.format(article_title=article_title, comments_text=comments_text)
+
+    response = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=1500,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    try:
+        result = json.loads(response.content[0].text)
+        return result.get("questions", [])
+    except json.JSONDecodeError:
+        text = response.content[0].text
+        match = re.search(r'\{.*\}', text, re.DOTALL)
+        if match:
+            return json.loads(match.group()).get("questions", [])
+        return [{"error": "Failed to parse discussion questions", "raw": text}]
+
+
+def extract_commercial_opportunities(comments_text: str, article_title: str) -> dict:
+    """Extract brand mentions, recommendations, and commercial opportunities from comments."""
+    ensure_client()
+
+    prompt = COMMERCIAL_OPPORTUNITIES.format(article_title=article_title, comments_text=comments_text)
+
+    response = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=2000,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    try:
+        result = json.loads(response.content[0].text)
+        return result
+    except json.JSONDecodeError:
+        text = response.content[0].text
+        match = re.search(r'\{.*\}', text, re.DOTALL)
+        if match:
+            return json.loads(match.group())
+        return {"error": "Failed to parse commercial opportunities", "raw": text}
 
 
 def analyze_comments(input_file: str, output_file: str = None) -> dict:
