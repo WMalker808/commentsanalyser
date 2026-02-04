@@ -13,9 +13,8 @@ from guardian_scraper import extract_short_url, fetch_all_comments
 from comment_analyzer import (
     prepare_comments_for_analysis,
     analyze_sentiment,
-    extract_themes,
-    generate_summary,
-    generate_followup_ideas,
+    generate_discussion_questions,
+    extract_commercial_opportunities,
 )
 
 app = Flask(__name__)
@@ -71,21 +70,20 @@ def generate_analysis(article_url: str):
         comments_text = prepare_comments_for_analysis(comments)
 
         # Phase 3: Run four analyses sequentially
+        yield format_sse({"type": "progress", "step": "analyzing", "message": "Generating discussion questions..."})
+        questions = generate_discussion_questions(comments_text, article_title)
+        yield format_sse({"type": "result", "section": "discussionQuestions", "data": questions})
+
         yield format_sse({"type": "progress", "step": "analyzing", "message": "Analyzing sentiment..."})
         sentiment = analyze_sentiment(comments_text, article_title)
         yield format_sse({"type": "result", "section": "sentiment", "data": sentiment})
 
-        yield format_sse({"type": "progress", "step": "analyzing", "message": "Extracting themes..."})
-        themes = extract_themes(comments_text, article_title)
-        yield format_sse({"type": "result", "section": "themes", "data": themes})
-
-        yield format_sse({"type": "progress", "step": "analyzing", "message": "Generating summary..."})
-        summary = generate_summary(comments_text, article_title, total)
-        yield format_sse({"type": "result", "section": "summary", "data": summary})
-
-        yield format_sse({"type": "progress", "step": "analyzing", "message": "Generating follow-up ideas..."})
-        followup = generate_followup_ideas(comments_text, article_title)
-        yield format_sse({"type": "result", "section": "followUpIdeas", "data": followup})
+        yield format_sse({"type": "progress", "step": "analyzing", "message": "Extracting commercial opportunities..."})
+        try:
+            commercial = extract_commercial_opportunities(comments_text, article_title)
+        except Exception:
+            commercial = {"brands": [], "recommendations": [], "opportunities": []}
+        yield format_sse({"type": "result", "section": "commercialOpportunities", "data": commercial})
 
         yield format_sse({"type": "complete", "message": "Analysis complete"})
 
@@ -97,7 +95,9 @@ def generate_analysis(article_url: str):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    response = Response(render_template("index.html"), content_type="text/html")
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
 
 
 @app.route("/analyze")
