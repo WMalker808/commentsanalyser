@@ -219,82 +219,6 @@
         .badge-mixed    { border-color: #e05e00; color: #e05e00; background: transparent; }
         .badge-neutral  { border-color: #707070; color: #707070; background: transparent; }
 
-        /* Themes */
-        .theme-item {
-            padding: 0.75rem 0;
-            border-bottom: 1px dotted #dcdcdc;
-        }
-        .theme-item:last-child { border-bottom: none; }
-        .theme-header {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            margin-bottom: 0.35rem;
-            flex-wrap: wrap;
-        }
-        .theme-rank {
-            width: 22px;
-            height: 22px;
-            background: #FFE500;
-            color: #121212;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-        .theme-header h4 { font-size: 1rem; margin: 0; font-weight: 700; }
-        .theme-desc { font-size: 0.9rem; color: #333; margin-bottom: 0.4rem; }
-        blockquote {
-            border-left: 4px solid #052962;
-            padding: 0.3rem 0.75rem;
-            margin: 0.4rem 0;
-            font-style: italic;
-            color: #555;
-            font-size: 0.9rem;
-            background: #f6f6f6;
-        }
-        .keywords { margin-top: 0.4rem; }
-        .keyword {
-            display: inline-block;
-            background: transparent;
-            color: #052962;
-            padding: 1px 6px;
-            border: 1px solid #052962;
-            font-size: 0.75rem;
-            margin: 2px;
-            font-weight: 700;
-        }
-
-        /* Summary */
-        .executive-summary {
-            font-size: 0.95rem;
-            color: #333;
-            margin-bottom: 0.75rem;
-            white-space: pre-line;
-            line-height: 1.5;
-        }
-        #summary-content h4 {
-            font-size: 0.95rem;
-            color: #052962;
-            margin: 0.75rem 0 0.35rem;
-            font-weight: 700;
-        }
-        .consensus-list li { color: #22874D; margin-bottom: 0.2rem; margin-left: 1.25rem; font-size: 0.9rem; }
-        .contention-list li { color: #c70000; margin-bottom: 0.2rem; margin-left: 1.25rem; font-size: 0.9rem; }
-        .notable-comment {
-            padding: 0.6rem 0;
-            border-bottom: 1px dotted #dcdcdc;
-        }
-        .notable-comment:last-child { border-bottom: none; }
-        .notable-why {
-            font-size: 0.8rem;
-            color: #707070;
-            margin-top: 0.2rem;
-            font-style: italic;
-        }
-
         /* Follow-up ideas */
         .followup-item {
             padding: 0.75rem 0;
@@ -330,6 +254,63 @@
             color: #c70000;
             padding: 1px 6px;
             border: 1px solid #c70000;
+            font-size: 0.75rem;
+            margin: 2px;
+            font-weight: 700;
+        }
+
+        /* Discussion questions */
+        .questions-intro {
+            font-size: 0.9rem;
+            color: #707070;
+            margin-bottom: 0.75rem;
+            font-style: italic;
+        }
+        .question-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px dotted #dcdcdc;
+        }
+        .question-item:last-child { border-bottom: none; }
+        .question-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
+            margin-bottom: 0.35rem;
+        }
+        .question-rank {
+            width: 22px;
+            height: 22px;
+            background: #FFE500;
+            color: #121212;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .question-text {
+            font-family: "Guardian Egyptian Web", Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #121212;
+            line-height: 1.3;
+        }
+        .question-intent {
+            font-size: 0.85rem;
+            color: #555;
+            margin: 0.25rem 0 0.4rem 26px;
+        }
+        .question-perspectives {
+            margin-left: 26px;
+        }
+        .perspective-tag {
+            display: inline-block;
+            background: transparent;
+            color: #052962;
+            padding: 1px 6px;
+            border: 1px solid #052962;
             font-size: 0.75rem;
             margin: 2px;
             font-weight: 700;
@@ -375,6 +356,12 @@
                 <div id="meta-content"></div>
             </div>
 
+            <div id="questions-card" class="result-card hidden">
+                <h2>Discussion Questions</h2>
+                <p class="questions-intro">Three questions to promote constructive, diverse debate:</p>
+                <div id="questions-content"></div>
+            </div>
+
             <div id="sentiment-card" class="result-card hidden">
                 <h2>Sentiment Analysis</h2>
                 <div id="sentiment-chart"></div>
@@ -382,19 +369,9 @@
                 <div id="sentiment-topics"></div>
             </div>
 
-            <div id="themes-card" class="result-card hidden">
-                <h2>Key Themes</h2>
-                <div id="themes-content"></div>
-            </div>
-
-            <div id="summary-card" class="result-card hidden">
-                <h2>Executive Summary</h2>
-                <div id="summary-content"></div>
-            </div>
-
-            <div id="followup-card" class="result-card hidden">
-                <h2>Follow-up Story Ideas</h2>
-                <div id="followup-content"></div>
+            <div id="commercial-card" class="result-card hidden">
+                <h2>Commercial Opportunities</h2>
+                <div id="commercial-content"></div>
             </div>
         </div>
     </main>
@@ -430,10 +407,9 @@
             document.getElementById("sentiment-chart").innerHTML = "";
             document.getElementById("sentiment-summary").textContent = "";
             document.getElementById("sentiment-topics").innerHTML = "";
-            document.getElementById("themes-content").innerHTML = "";
-            document.getElementById("summary-content").innerHTML = "";
-            document.getElementById("followup-content").innerHTML = "";
-            ["meta-card", "sentiment-card", "themes-card", "summary-card", "followup-card"].forEach(function(id) {
+            document.getElementById("questions-content").innerHTML = "";
+            document.getElementById("commercial-content").innerHTML = "";
+            ["meta-card", "sentiment-card", "questions-card", "commercial-card"].forEach(function(id) {
                 hide(document.getElementById(id));
             });
             hide(resultsSection);
@@ -455,12 +431,16 @@
             eventSource = new EventSource("/analyze?url=" + encodeURIComponent(url));
 
             eventSource.onmessage = function(event) {
-                var data = JSON.parse(event.data);
-                switch (data.type) {
-                    case "progress": handleProgress(data); break;
-                    case "result":   handleResult(data);   break;
-                    case "complete": handleComplete();      break;
-                    case "error":    handleError(data.message); break;
+                try {
+                    var data = JSON.parse(event.data);
+                    switch (data.type) {
+                        case "progress": handleProgress(data); break;
+                        case "result":   handleResult(data);   break;
+                        case "complete": handleComplete();      break;
+                        case "error":    handleError(data.message); break;
+                    }
+                } catch (e) {
+                    console.error("SSE parse/render error:", e);
                 }
             };
 
@@ -475,10 +455,9 @@
         function handleProgress(data) {
             progressMessage.textContent = data.message;
             var msg = data.message.toLowerCase();
-            if (msg.includes("sentiment"))        currentProgress = 25;
-            else if (msg.includes("theme"))       currentProgress = 45;
-            else if (msg.includes("summary"))     currentProgress = 65;
-            else if (msg.includes("follow-up"))   currentProgress = 80;
+            if (msg.includes("discussion"))       currentProgress = 30;
+            else if (msg.includes("sentiment"))   currentProgress = 55;
+            else if (msg.includes("commercial"))  currentProgress = 80;
             else if (msg.includes("scraped"))     currentProgress = 15;
             else if (msg.includes("preparing"))   currentProgress = 20;
             else currentProgress = Math.min(currentProgress + 3, 15);
@@ -490,9 +469,8 @@
             switch (data.section) {
                 case "meta":         renderMeta(data.data);     break;
                 case "sentiment":    renderSentiment(data.data); break;
-                case "themes":       renderThemes(data.data);   break;
-                case "summary":      renderSummary(data.data);  break;
-                case "followUpIdeas": renderFollowUp(data.data); break;
+                case "discussionQuestions": renderDiscussionQuestions(data.data); break;
+                case "commercialOpportunities": renderCommercial(data.data); break;
             }
         }
 
@@ -503,6 +481,14 @@
             submitBtn.disabled = false;
             submitBtn.textContent = "Analyze";
             setTimeout(function() { hide(progressSection); }, 1500);
+
+            // Ensure commercial card is visible even if its SSE event was missed
+            var commercialCard = document.getElementById("commercial-card");
+            if (commercialCard.classList.contains("hidden")) {
+                show(commercialCard);
+                document.getElementById("commercial-content").innerHTML =
+                    '<p style="color:#707070;">No commercial signals found in comments.</p>';
+            }
         }
 
         function handleError(msg) {
@@ -566,82 +552,76 @@
             }
         }
 
-        function renderThemes(themes) {
-            var card = document.getElementById("themes-card");
+        function renderDiscussionQuestions(questions) {
+            var card = document.getElementById("questions-card");
             show(card);
 
-            document.getElementById("themes-content").innerHTML = themes.map(function(theme, i) {
-                var quotes = (theme.representativeQuotes || []).map(function(q) {
-                    return '<blockquote>' + escapeHtml(q) + '</blockquote>';
-                }).join("");
-
-                var keywords = (theme.keywords || []).map(function(k) {
-                    return '<span class="keyword">' + escapeHtml(k) + '</span>';
-                }).join("");
-
-                return '<div class="theme-item">' +
-                    '<div class="theme-header">' +
-                        '<span class="theme-rank">' + (i + 1) + '</span>' +
-                        '<h4>' + escapeHtml(theme.name) + '</h4>' +
-                        '<span class="badge badge-' + theme.frequency + '">' + theme.frequency + '</span>' +
-                        '<span class="badge badge-' + theme.sentiment + '">' + theme.sentiment + '</span>' +
-                    '</div>' +
-                    '<p class="theme-desc">' + escapeHtml(theme.description) + '</p>' +
-                    quotes +
-                    (keywords ? '<div class="keywords">' + keywords + '</div>' : '') +
+            document.getElementById("questions-content").innerHTML = questions.map(function(q) {
+                return '<div class="question-item">' +
+                    '<p class="question-text">' + escapeHtml(q.question) + '</p>' +
+                    '<p class="question-intent" style="margin-left:0;">' + escapeHtml(q.intent) + '</p>' +
                 '</div>';
             }).join("");
         }
 
-        function renderSummary(data) {
-            var card = document.getElementById("summary-card");
+        function renderCommercial(data) {
+            var card = document.getElementById("commercial-card");
             show(card);
 
-            var html = '<div class="executive-summary">' + escapeHtml(data.executiveSummary || "") + '</div>';
+            if (!data || data.error) {
+                document.getElementById("commercial-content").innerHTML =
+                    '<p style="color:#707070;">No commercial signals found in comments.</p>';
+                return;
+            }
 
-            if (data.consensus && data.consensus.length) {
-                html += '<h4>Points of Consensus</h4><ul class="consensus-list">' +
-                    data.consensus.map(function(p) { return '<li>' + escapeHtml(p) + '</li>'; }).join("") +
-                '</ul>';
-            }
-            if (data.contention && data.contention.length) {
-                html += '<h4>Points of Contention</h4><ul class="contention-list">' +
-                    data.contention.map(function(p) { return '<li>' + escapeHtml(p) + '</li>'; }).join("") +
-                '</ul>';
-            }
-            if (data.notableComments && data.notableComments.length) {
-                html += '<h4>Notable Comments</h4>' +
-                    data.notableComments.map(function(c) {
-                        return '<div class="notable-comment">' +
-                            '<blockquote>' + escapeHtml(c.excerpt) + '</blockquote>' +
-                            '<p class="notable-why">' + escapeHtml(c.why) + '</p>' +
+            var html = "";
+
+            try {
+                var brands = data.brands || [];
+                if (brands.length) {
+                    html += '<h4 style="font-size:0.95rem;color:#052962;margin-bottom:0.4rem;">Brands &amp; Products Mentioned</h4>';
+                    html += brands.map(function(b) {
+                        return '<div class="topic-row">' +
+                            '<span class="topic-name">' + escapeHtml(b.name || "") + '</span>' +
+                            '<span class="badge badge-' + (b.sentiment || "neutral") + '">' + (b.sentiment || "neutral") + '</span>' +
+                            '<span class="topic-pct">' + (b.mentions || 0) + ' mention' + (b.mentions !== 1 ? 's' : '') + '</span>' +
+                            '<span style="font-size:0.8rem;color:#707070;margin-left:0.4rem;">' + escapeHtml(b.category || "") + '</span>' +
                         '</div>';
                     }).join("");
+                }
+
+                var recs = data.recommendations || [];
+                if (recs.length) {
+                    html += '<h4 style="font-size:0.95rem;color:#052962;margin:0.75rem 0 0.4rem;">Reader Recommendations</h4>';
+                    html += recs.map(function(r) {
+                        return '<div class="topic-row">' +
+                            '<span class="topic-name">' + escapeHtml(r.item || "") + '</span>' +
+                            '<span style="font-size:0.8rem;color:#707070;margin-left:0.4rem;">' + escapeHtml(r.category || "") + '</span>' +
+                            (r.quote ? '<p style="font-size:0.85rem;color:#555;margin-top:0.2rem;font-style:italic;">"' + escapeHtml(r.quote) + '"</p>' : '') +
+                        '</div>';
+                    }).join("");
+                }
+
+                var opps = data.opportunities || [];
+                if (opps.length) {
+                    html += '<h4 style="font-size:0.95rem;color:#052962;margin:0.75rem 0 0.4rem;">Opportunities</h4>';
+                    html += opps.map(function(o, i) {
+                        return '<div class="followup-item">' +
+                            '<div class="followup-header">' +
+                                '<span class="followup-rank">' + (i + 1) + '</span>' +
+                                '<h4>' + escapeHtml(o.target || "") + '</h4>' +
+                                '<span class="badge badge-medium">' + escapeHtml(o.type || "") + '</span>' +
+                            '</div>' +
+                            '<p style="font-size:0.9rem;color:#333;">' + escapeHtml(o.rationale || "") + '</p>' +
+                        '</div>';
+                    }).join("");
+                }
+            } catch (e) {
+                html = "";
             }
 
-            document.getElementById("summary-content").innerHTML = html;
-        }
-
-        function renderFollowUp(ideas) {
-            var card = document.getElementById("followup-card");
-            show(card);
-
-            document.getElementById("followup-content").innerHTML = ideas.map(function(idea, i) {
-                var sources = (idea.suggestedSources || []).map(function(s) {
-                    return '<span class="source-tag">' + escapeHtml(s) + '</span>';
-                }).join("");
-
-                return '<div class="followup-item">' +
-                    '<div class="followup-header">' +
-                        '<span class="followup-rank">' + (i + 1) + '</span>' +
-                        '<h4>' + escapeHtml(idea.headline) + '</h4>' +
-                        '<span class="badge badge-' + idea.interestLevel + '">' + idea.interestLevel + ' interest</span>' +
-                    '</div>' +
-                    '<p class="followup-angle">' + escapeHtml(idea.angle) + '</p>' +
-                    '<p class="followup-evidence"><strong>Evidence:</strong> ' + escapeHtml(idea.evidence) + '</p>' +
-                    (sources ? '<div class="suggested-sources"><strong>Suggested sources:</strong> ' + sources + '</div>' : '') +
-                '</div>';
-            }).join("");
+            if (!html) html = '<p style="color:#707070;">No commercial signals found in comments.</p>';
+            document.getElementById("commercial-content").innerHTML = html;
         }
     </script>
 </body>
